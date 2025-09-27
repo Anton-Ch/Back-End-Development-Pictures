@@ -35,7 +35,10 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    """return all pictures in data"""
+    if data:
+        return jsonify(data), 200
+
 
 ######################################################################
 # GET A PICTURE
@@ -44,7 +47,11 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    for picture in data:
+        if picture["id"] == id:
+            # print(picture["pic_url"])
+            return jsonify(picture), 200
+    return jsonify({"Message": f"picture with id {id} not found"}), 404
 
 
 ######################################################################
@@ -52,7 +59,12 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    uploaded_picture = request.get_json()
+    for picture in data:
+        if picture["id"] == uploaded_picture["id"]:
+            return jsonify({"Message": f"picture with id {picture['id']} already present"}), 302
+    data.append(uploaded_picture)
+    return jsonify(uploaded_picture), 201
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +73,22 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    uploaded_picture = request.get_json()
+    for index, picture in enumerate(data):
+        if picture["id"] == id:
+            data[index] = uploaded_picture
+            return jsonify(picture), 200
+
+    return jsonify({"Message": f"picture not"}), 404
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    for index, picture in enumerate(data):
+        if picture["id"] == id:
+            data.pop(index)
+            return "", 204
+    return jsonify({"Message": "picture not"}), 404
+
